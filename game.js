@@ -1,7 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('scoreValue');
-const toggleMusicButton = document.getElementById('toggleMusic');
 
 // Set canvas size
 canvas.width = 800;
@@ -19,7 +18,6 @@ const player = {
 const stars = [];
 const obstacles = [];
 let score = 0;
-let isMusicPlaying = false;
 
 // Game settings
 const starCount = 5;
@@ -69,20 +67,6 @@ document.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });
 
-// Music controls
-toggleMusicButton.addEventListener('click', () => {
-    if (isMusicPlaying) {
-        soundManager.stopBackgroundMusic();
-        toggleMusicButton.textContent = '🔈 Toggle Music';
-        toggleMusicButton.classList.add('muted');
-    } else {
-        soundManager.startBackgroundMusic();
-        toggleMusicButton.textContent = '🔊 Toggle Music';
-        toggleMusicButton.classList.remove('muted');
-    }
-    isMusicPlaying = !isMusicPlaying;
-});
-
 // Update player position
 function updatePlayer() {
     if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
@@ -117,7 +101,6 @@ function checkCollisions() {
             stars.push(createStar());
             score += 10;
             scoreElement.textContent = score;
-            soundManager.playStarCollect();
         }
     }
 
@@ -125,7 +108,6 @@ function checkCollisions() {
     obstacles.forEach(obstacle => {
         if (isColliding(player, obstacle)) {
             // Game over
-            soundManager.playGameOver();
             alert(`Game Over! Final Score: ${score}`);
             resetGame();
         }
