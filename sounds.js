@@ -1,7 +1,14 @@
 class SoundManager {
     constructor() {
+        console.log('Initializing SoundManager...');
+        
         // Create audio context (this is more reliable than HTML5 Audio)
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('AudioContext created successfully');
+        } catch (error) {
+            console.error('Failed to create AudioContext:', error);
+        }
         
         // Audio elements
         this.bgMusic = new Audio();
@@ -16,6 +23,7 @@ class SoundManager {
         // Configure background music
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.3;
+        this.bgMusic.preload = 'auto';
 
         // Configure sound effects
         this.starSound.volume = 0.4;
@@ -25,60 +33,92 @@ class SoundManager {
         this.isMusicEnabled = false;
         this.hasInteracted = false;
 
-        // Add error handling
-        this.bgMusic.onerror = () => console.log('Error loading background music');
-        this.starSound.onerror = () => console.log('Error loading star sound');
-        this.gameOverSound.onerror = () => console.log('Error loading game over sound');
+        // Add error handling and load events
+        this.bgMusic.onerror = (e) => console.error('Error loading background music:', e);
+        this.starSound.onerror = (e) => console.error('Error loading star sound:', e);
+        this.gameOverSound.onerror = (e) => console.error('Error loading game over sound:', e);
+
+        this.bgMusic.oncanplaythrough = () => console.log('Background music loaded and ready');
+        this.starSound.oncanplaythrough = () => console.log('Star sound loaded and ready');
+        this.gameOverSound.oncanplaythrough = () => console.log('Game over sound loaded and ready');
 
         // Preload sounds
         this.preloadSounds();
+        
+        // Setup initial interaction handler
+        this.setupInteractionHandler();
+        
+        console.log('SoundManager initialization complete');
     }
 
     preloadSounds() {
-        this.bgMusic.load();
-        this.starSound.load();
-        this.gameOverSound.load();
+        console.log('Preloading sounds...');
+        try {
+            this.bgMusic.load();
+            this.starSound.load();
+            this.gameOverSound.load();
+        } catch (error) {
+            console.error('Error preloading sounds:', error);
+        }
     }
 
     async startBackgroundMusic() {
+        console.log('Attempting to start background music...');
         try {
             // Resume audio context if it's suspended
             if (this.audioContext.state === 'suspended') {
+                console.log('Resuming suspended AudioContext...');
                 await this.audioContext.resume();
             }
 
             // Start or resume the music
             if (!this.isMusicEnabled) {
+                console.log('Playing background music...');
                 await this.bgMusic.play();
                 this.isMusicEnabled = true;
                 console.log('Music started successfully');
+                return true;
             }
         } catch (error) {
-            console.log('Error starting music:', error);
+            console.error('Error starting music:', error);
             // If autoplay was prevented, we'll wait for user interaction
             if (!this.hasInteracted) {
+                console.log('Setting up interaction handler due to autoplay prevention');
                 this.setupInteractionHandler();
             }
+            return false;
         }
     }
 
     setupInteractionHandler() {
+        console.log('Setting up interaction handler...');
         const handler = async () => {
+            console.log('User interaction detected');
             this.hasInteracted = true;
-            await this.startBackgroundMusic();
-            // Remove the handlers after successful interaction
-            document.removeEventListener('click', handler);
-            document.removeEventListener('keydown', handler);
+            const success = await this.startBackgroundMusic();
+            if (success) {
+                console.log('Removing interaction handlers');
+                document.removeEventListener('click', handler);
+                document.removeEventListener('keydown', handler);
+                document.removeEventListener('touchstart', handler);
+            }
         };
 
         document.addEventListener('click', handler);
         document.addEventListener('keydown', handler);
+        document.addEventListener('touchstart', handler);
     }
 
     stopBackgroundMusic() {
-        this.bgMusic.pause();
-        this.bgMusic.currentTime = 0;
-        this.isMusicEnabled = false;
+        console.log('Stopping background music...');
+        try {
+            this.bgMusic.pause();
+            this.bgMusic.currentTime = 0;
+            this.isMusicEnabled = false;
+            console.log('Background music stopped');
+        } catch (error) {
+            console.error('Error stopping music:', error);
+        }
     }
 
     async playStarCollect() {
@@ -86,7 +126,7 @@ class SoundManager {
             this.starSound.currentTime = 0;
             await this.starSound.play();
         } catch (error) {
-            console.log('Error playing star sound:', error);
+            console.error('Error playing star sound:', error);
         }
     }
 
@@ -95,7 +135,7 @@ class SoundManager {
             this.gameOverSound.currentTime = 0;
             await this.gameOverSound.play();
         } catch (error) {
-            console.log('Error playing game over sound:', error);
+            console.error('Error playing game over sound:', error);
         }
     }
 
@@ -107,8 +147,3 @@ class SoundManager {
 
 // Create global sound manager instance
 const soundManager = new SoundManager();
-
-// Setup initial interaction handler
-document.addEventListener('DOMContentLoaded', () => {
-    soundManager.setupInteractionHandler();
-});
