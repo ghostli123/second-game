@@ -25,3 +25,32 @@ canvas {
     font-family: Arial, sans-serif;
     font-size: 20px;
 }
+
+.sound-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#toggleMusic {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#toggleMusic:hover {
+    background-color: #45a049;
+}
+
+#toggleMusic.muted {
+    background-color: #f44336;
+}
