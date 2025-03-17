@@ -15,10 +15,10 @@ class SoundManager {
         this.starSound = new Audio();
         this.gameOverSound = new Audio();
 
-        // Set sources
-        this.bgMusic.src = 'https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3';
-        this.starSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3';
-        this.gameOverSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3';
+        // Set sources using freely available sounds
+        this.bgMusic.src = 'https://raw.githubusercontent.com/ghostli123/second-game/main/assets/background-music.mp3';
+        this.starSound.src = 'https://raw.githubusercontent.com/ghostli123/second-game/main/assets/collect-star.mp3';
+        this.gameOverSound.src = 'https://raw.githubusercontent.com/ghostli123/second-game/main/assets/game-over.mp3';
 
         // Configure background music
         this.bgMusic.loop = true;
